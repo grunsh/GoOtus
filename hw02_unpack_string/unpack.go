@@ -33,12 +33,12 @@ func Unpack(s string) (string, error) {
 			case IsLetter(value):
 				RepeatTimes = 1
 			}
+			tmpString.WriteString(strings.Repeat(string(prevRune), RepeatTimes))
 		case !unicode.IsDigit(prevRune):
 			return "", ErrInvalidString
 		case unicode.IsDigit(value):
 			return "", ErrInvalidString
 		}
-		tmpString.WriteString(strings.Repeat(string(prevRune), RepeatTimes))
 		prevRune = value
 	}
 	lastRune, _ := utf8.DecodeLastRuneInString(s)
