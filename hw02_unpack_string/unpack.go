@@ -10,7 +10,7 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func IsLetter(l rune) bool {
-	return unicode.IsLetter(l) || l == rune('\n')
+	return (l >= 'A' && l <= 'Z') || (l >= 'a' && l <= 'z') || l == rune('\n')
 }
 
 func Unpack(s string) (string, error) {
@@ -42,8 +42,12 @@ func Unpack(s string) (string, error) {
 		prevRune = value
 	}
 	lastRune, _ := utf8.DecodeLastRuneInString(s)
-	if IsLetter(lastRune) {
+	switch {
+	case IsLetter(lastRune):
 		tmpString.WriteString(string(lastRune))
+	case unicode.IsDigit(lastRune):
+	default:
+		return "", ErrInvalidString
 	}
 	return tmpString.String(), nil
 }
