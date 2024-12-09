@@ -10,16 +10,23 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func IsLetter(l rune) bool {
-	return (l >= 'A' && l <= 'Z') || (l >= 'a' && l <= 'z') || l == rune('\n')
+	return unicode.IsLetter(l) ||
+		(l >= 'a' && l <= 'z') ||
+		l == rune('\n') ||
+		l == rune(' ') ||
+		l == '_'
 }
 
 func Unpack(s string) (string, error) {
 	if s == "" {
 		return "", nil
 	}
-	var RepeatTimes int
+	var repeatTimes int
 	var tmpString strings.Builder
-	prevRune, _ := utf8.DecodeRuneInString(s)
+	prevRune, er := utf8.DecodeRuneInString(s)
+	if er == 0 {
+		return "", ErrInvalidString
+	}
 	runeSize := utf8.RuneLen(prevRune)
 	if !IsLetter(prevRune) {
 		return "", ErrInvalidString
@@ -29,11 +36,13 @@ func Unpack(s string) (string, error) {
 		case IsLetter(prevRune):
 			switch {
 			case unicode.IsDigit(value):
-				RepeatTimes = int(value - '0')
+				repeatTimes = int(value - '0')
 			case IsLetter(value):
-				RepeatTimes = 1
+				repeatTimes = 1
+			default:
+				return "", ErrInvalidString
 			}
-			tmpString.WriteString(strings.Repeat(string(prevRune), RepeatTimes))
+			tmpString.WriteString(strings.Repeat(string(prevRune), repeatTimes))
 		case !unicode.IsDigit(prevRune):
 			return "", ErrInvalidString
 		case unicode.IsDigit(value):
