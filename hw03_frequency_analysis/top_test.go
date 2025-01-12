@@ -84,6 +84,16 @@ var testCases = []testCase{
 			"не",        // 4
 		},
 	},
+	{
+		text: `aa aa dd ss ff aa - ---`,
+		expected: []string{
+			"aa",  // 3
+			"---", // 1
+			"dd",  // 1
+			"ff",  // 1
+			"ss",  // 1
+		},
+	},
 }
 
 func TestTop10(t *testing.T) {

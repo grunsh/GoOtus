@@ -94,5 +94,8 @@ func Top10(s string) []string {
 			break
 		}
 	}
+	if len(retSlice) < topWords {
+		topWords = len(retSlice)
+	}
 	return retSlice[0:topWords]
 }
