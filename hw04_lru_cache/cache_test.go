@@ -2,11 +2,12 @@ package hw04lrucache
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require" //nolint
 )
@@ -86,12 +87,11 @@ func TestCache(t *testing.T) {
 		assert.True(t, ok)
 		require.Equal(t, 300, val,
 			fmt.Sprintf("В тесте %v пропало ccc -> 300", t.Name()))
-
 	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	//t.Skip() // Remove me if task with asterisk completed.
+	// t.Skip() // Remove me if task with asterisk completed.
 
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}

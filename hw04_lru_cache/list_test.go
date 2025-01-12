@@ -26,7 +26,6 @@ func TestList(t *testing.T) {
 			fmt.Sprintf(" В тесте %q головы не должно быть. Список должен быть пуст.", t.Name()))
 		require.Nil(t, l.Back(),
 			fmt.Sprintf(" В тесте %q хвоста не должно быть. Список должен быть пуст.", t.Name()))
-
 	})
 
 	t.Run("complex", func(t *testing.T) {
