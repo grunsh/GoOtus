@@ -1,12 +1,14 @@
 package hw04lrucache
 
 import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require" //nolint
 )
 
 func TestCache(t *testing.T) {
@@ -50,12 +52,46 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		// Создаём кэш с ёмкостью 3.
+		// Пишем в него aaa-> 100, bbb -> 200, ccc -> 300.
+		// Они располагаются в обратном порядке от начала списка.
+		// Запрашиваем aaa, чтобы вытащить его в начало.
+		// Добавляем ddd -> 400. Должно вытестниться bbb -> 200.
+		// Проверим всё что осталось. Должно быть ddd -> 400, aaa-> 100, ccc -> 300.
+
+		c := NewCache(3)
+
+		wasInCache := c.Set("aaa", 100)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("bbb", 200)
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("ccc", 300)
+		require.False(t, wasInCache)
+
+		val, ok := c.Get("aaa")
+		require.True(t, ok)
+		require.Equal(t, 100, val)
+
+		wasInCache = c.Set("ddd", 400)
+		require.False(t, wasInCache)
+
+		val, ok = c.Get("bbb")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("ccc")
+		require.True(t, ok)
+		assert.True(t, ok)
+		require.Equal(t, 300, val,
+			fmt.Sprintf("В тесте %v пропало ccc -> 300", t.Name()))
+
 	})
 }
 
 func TestCacheMultithreading(t *testing.T) {
-	t.Skip() // Remove me if task with asterisk completed.
+	//t.Skip() // Remove me if task with asterisk completed.
 
 	c := NewCache(10)
 	wg := &sync.WaitGroup{}

@@ -1,9 +1,10 @@
 package hw04lrucache
 
 import (
+	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require" //nolint
 )
 
 func TestList(t *testing.T) {
@@ -13,6 +14,19 @@ func TestList(t *testing.T) {
 		require.Equal(t, 0, l.Len())
 		require.Nil(t, l.Front())
 		require.Nil(t, l.Back())
+	})
+
+	t.Run("Проверка удаления единственного элемента", func(t *testing.T) {
+		l := NewList()
+		el := l.PushFront(10) // [10]
+		l.Remove(el)
+		require.Equal(t, 0, l.Len(),
+			fmt.Sprintf(" В тесте %q длина списка сломалась.", t.Name()))
+		require.Nil(t, l.Front(),
+			fmt.Sprintf(" В тесте %q головы не должно быть. Список должен быть пуст.", t.Name()))
+		require.Nil(t, l.Back(),
+			fmt.Sprintf(" В тесте %q хвоста не должно быть. Список должен быть пуст.", t.Name()))
+
 	})
 
 	t.Run("complex", func(t *testing.T) {
