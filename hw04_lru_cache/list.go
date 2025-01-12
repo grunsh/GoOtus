@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+const CacheCapacity = 5
+
 type List interface {
 	Len() int
 	Front() *ListItem
