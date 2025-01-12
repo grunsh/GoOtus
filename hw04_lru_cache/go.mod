@@ -1,4 +1,4 @@
-module github.com/fixme_my_friend/hw04_lru_cache
+module github.com/grunsh/hw04lrucache
 
 go 1.22
 
