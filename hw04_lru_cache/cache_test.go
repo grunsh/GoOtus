@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert" //nolint
 
 	"github.com/stretchr/testify/require" //nolint
 )
