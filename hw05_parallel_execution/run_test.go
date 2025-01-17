@@ -67,4 +67,43 @@ func TestRun(t *testing.T) {
 		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
 		require.LessOrEqual(t, int64(elapsedTime), int64(sumTime/2), "tasks were run sequentially?")
 	})
+
+	t.Run("500 non sleep load tasks", func(t *testing.T) {
+		fmt.Println(t.Name())
+		tasksCount := 500
+		tasks := make([]Task, 0, tasksCount)
+
+		var runTasksCount int32
+		var sumTime time.Duration
+
+		var someCPULoad = func() {
+			r := rand.New(rand.NewSource(time.Now().UnixNano()))
+			min := 500_000
+			max := 1_000_000
+			randomNumber := r.Intn(max-min+1) + min
+			X := 0
+			for i := 0; i < randomNumber-1; i++ {
+				X = i * i * r.Intn(min)
+			}
+			_ = X
+		}
+
+		for i := 0; i < tasksCount; i++ {
+			taskSleep := time.Millisecond * time.Duration(rand.Intn(100))
+			sumTime += taskSleep
+
+			tasks = append(tasks, func() error {
+				someCPULoad()
+				atomic.AddInt32(&runTasksCount, 1)
+				return nil
+			})
+		}
+
+		workersCount := 5
+		maxErrorsCount := 1
+
+		err := Run(tasks, workersCount, maxErrorsCount)
+		require.NoError(t, err)
+		require.Equal(t, runTasksCount, int32(tasksCount), "not all tasks were completed")
+	})
 }
