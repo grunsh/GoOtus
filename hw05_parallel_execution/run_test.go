@@ -78,8 +78,8 @@ func TestRun(t *testing.T) {
 
 		var someCPULoad = func() {
 			r := rand.New(rand.NewSource(time.Now().UnixNano()))
-			min := 500_000
-			max := 1_000_000
+			min := 50_000
+			max := 100_000
 			randomNumber := r.Intn(max-min+1) + min
 			X := 0
 			for i := 0; i < randomNumber-1; i++ {
