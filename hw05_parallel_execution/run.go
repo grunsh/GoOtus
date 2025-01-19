@@ -19,6 +19,7 @@ func Run(tasks []Task, n, m int) error {
 	errCh := make(chan error)
 	doneCh := make(chan struct{})
 	var workersWG sync.WaitGroup
+	var retErr error
 
 	// Запускаем n работяг
 	for i := 0; i < n; i++ {
@@ -33,7 +34,7 @@ func Run(tasks []Task, n, m int) error {
 		}()
 	}
 
-	// Насяльника. Раздаёт всем задачки и считает ошибки
+	// Насяльника. Раздаёт всем задачки и считает ошибки. Завершает работу после завершения работы всех работяг.
 	go func() {
 		errCount := 0
 	taskloop:
@@ -64,9 +65,9 @@ func Run(tasks []Task, n, m int) error {
 			select {
 			case <-doneCh:
 				if errCount >= m {
-					errCh <- ErrErrorsLimitExceeded
+					retErr = ErrErrorsLimitExceeded
 				} else {
-					errCh <- nil
+					retErr = nil
 				}
 				return
 			case <-errCh:
@@ -81,5 +82,5 @@ func Run(tasks []Task, n, m int) error {
 	// Работяги закончили свою работу. Начальнику не от кого ждать ошибок. Увольняем.
 	doneCh <- struct{}{}
 
-	return <-errCh
+	return retErr
 }
