@@ -64,7 +64,7 @@ func Run(tasks []Task, n, m int) error {
 		for {
 			select {
 			case <-doneCh:
-				if errCount >= m {
+				if errCount >= m { // Если вдруг добрались до лимита ошибок пока рабочие доделывали работу
 					retErr = ErrErrorsLimitExceeded
 				} else {
 					retErr = nil
