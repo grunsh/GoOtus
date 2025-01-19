@@ -1,0 +1,7 @@
+linters-settings:
+  depguard:
+    list-type: allow
+    include-go-root: true
+    packages:
+      - github.com/stretchr/testify/require
+      -
