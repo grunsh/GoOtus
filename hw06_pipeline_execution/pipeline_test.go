@@ -114,11 +114,7 @@ func TestAllStageStop(t *testing.T) {
 				defer close(out)
 				for v := range in {
 					time.Sleep(sleepPerStage)
-					select {
-					case out <- f(v):
-						//case <-time.After(time.Millisecond * 100): // Таймаут 100 мс
-						//	fmt.Println("Канал, похоже, никто не читает")
-					}
+					out <- f(v)
 				}
 			}()
 			return out
