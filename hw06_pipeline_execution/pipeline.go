@@ -31,11 +31,9 @@ func wrStage(in In, done In, s Stage) Out {
 				select {
 				case out <- val:
 				case <-done:
-					go func() {
-						for v := range readChan {
-							_ = v
-						}
-					}()
+					for v := range readChan {
+						_ = v
+					}
 					return
 				}
 			}
