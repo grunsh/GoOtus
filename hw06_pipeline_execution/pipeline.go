@@ -18,9 +18,11 @@ func wrStage(in In, done In, s Stage) Out {
 		for {
 			select {
 			case <-done:
-				for v := range readChan {
-					_ = v
-				}
+				go func() {
+					for v := range readChan {
+						_ = v
+					}
+				}()
 				return
 			case val, ok = <-readChan:
 				if !ok {
@@ -29,9 +31,11 @@ func wrStage(in In, done In, s Stage) Out {
 				select {
 				case out <- val:
 				case <-done:
-					for v := range readChan {
-						_ = v
-					}
+					go func() {
+						for v := range readChan {
+							_ = v
+						}
+					}()
 					return
 				}
 			}
