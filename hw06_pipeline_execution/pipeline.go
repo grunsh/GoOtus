@@ -19,7 +19,7 @@ func wrStage(in In, done In, s Stage) Out {
 			select {
 			case <-done:
 				go func() {
-					for v := range readChan {
+					for v := range readChan { // Help! Без этого блокируется тест. С этим, проваливается по времени.
 						_ = v
 					}
 				}()
