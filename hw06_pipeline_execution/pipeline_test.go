@@ -1,6 +1,7 @@
 package hw06pipelineexecution
 
 import (
+	"fmt"
 	"strconv"
 	"sync"
 	"testing"
@@ -11,7 +12,7 @@ import (
 
 const (
 	sleepPerStage = time.Millisecond * 100
-	fault         = sleepPerStage / 2
+	fault         = sleepPerStage
 )
 
 var isFullTesting = true
@@ -40,6 +41,7 @@ func TestPipeline(t *testing.T) {
 	}
 
 	t.Run("simple case", func(t *testing.T) {
+		fmt.Println(t.Name())
 		in := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
 
@@ -65,6 +67,7 @@ func TestPipeline(t *testing.T) {
 	})
 
 	t.Run("done case", func(t *testing.T) {
+		fmt.Println(t.Name())
 		in := make(Bi)
 		done := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
@@ -96,6 +99,7 @@ func TestPipeline(t *testing.T) {
 }
 
 func TestAllStageStop(t *testing.T) {
+	fmt.Println(t.Name())
 	if !isFullTesting {
 		return
 	}
@@ -125,6 +129,7 @@ func TestAllStageStop(t *testing.T) {
 	}
 
 	t.Run("done case", func(t *testing.T) {
+		fmt.Println(t.Name())
 		in := make(Bi)
 		done := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
