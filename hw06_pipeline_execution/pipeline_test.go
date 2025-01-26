@@ -12,7 +12,7 @@ import (
 
 const (
 	sleepPerStage = time.Millisecond * 100
-	fault         = sleepPerStage
+	fault         = sleepPerStage * 4
 )
 
 var isFullTesting = true
