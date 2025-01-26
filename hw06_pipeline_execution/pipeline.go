@@ -1,9 +1,5 @@
 package hw06pipelineexecution
 
-import (
-	"fmt"
-)
-
 type (
 	In  = <-chan interface{}
 	Out = In
@@ -12,7 +8,7 @@ type (
 
 type Stage func(in In) (out Out)
 
-var I int = 0
+var I int
 
 func wrStage(in In, done In, s Stage) Out {
 	out := make(Bi)
@@ -22,21 +18,24 @@ func wrStage(in In, done In, s Stage) Out {
 	go func(stageNum int) {
 		defer close(out)
 		readChan := s(in)
-		fmt.Println("Запущен стейдж: ", stageNum)
+		//fmt.Println("Запущен стейдж: ", stageNum)
 		for {
 			select {
 			case <-done:
-				fmt.Println("Выход из стейдж по done: ", stageNum)
+				//fmt.Println("Выход из стейдж по done: ", stageNum)
+				for v := range readChan {
+					_ = v
+				}
 				return
 			case val, ok = <-readChan:
 				if !ok {
-					fmt.Println("Выход из стейдж по закрытию канала чтения: ", stageNum)
+					//fmt.Println("Выход из стейдж по закрытию канала чтения: ", stageNum)
 					return
 				}
 				select {
 				case out <- val:
 				case <-done:
-					fmt.Println("Выход из стейдж по done2: ", stageNum)
+					//fmt.Println("Выход из стейдж по done2: ", stageNum)
 					return
 				}
 			}

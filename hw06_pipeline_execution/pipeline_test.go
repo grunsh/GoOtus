@@ -114,7 +114,11 @@ func TestAllStageStop(t *testing.T) {
 				defer close(out)
 				for v := range in {
 					time.Sleep(sleepPerStage)
-					out <- f(v)
+					select {
+					case out <- f(v):
+						//case <-time.After(time.Millisecond * 100): // Таймаут 100 мс
+						//	fmt.Println("Канал, похоже, никто не читает")
+					}
 				}
 			}()
 			return out
@@ -155,6 +159,5 @@ func TestAllStageStop(t *testing.T) {
 		wg.Wait()
 
 		require.Len(t, result, 0)
-
 	})
 }
