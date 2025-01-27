@@ -1,4 +1,4 @@
-module github.com/grunsh/hw06_pipeline_execution
+module github.com/grunsh/GoOtus/hw06_pipeline_execution
 
 go 1.22
 

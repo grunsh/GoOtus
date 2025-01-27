@@ -12,11 +12,13 @@ func inDone(in In, done In) Out {
 	out := make(Bi)
 	go func() {
 		defer close(out)
+		defer func() {
+			for range in {
+			}
+		}()
 		for {
 			select {
 			case <-done:
-				for range in {
-				}
 				return
 			case val, ok := <-in:
 				if !ok {
@@ -30,7 +32,7 @@ func inDone(in In, done In) Out {
 }
 
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	inChan := in
+	inChan := inDone(in, done)
 	for _, stage := range stages {
 		inChan = stage(inDone(inChan, done))
 	}

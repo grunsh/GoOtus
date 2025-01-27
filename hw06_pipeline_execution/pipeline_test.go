@@ -130,7 +130,6 @@ func TestAllStageStop(t *testing.T) {
 	}
 
 	t.Run("done case", func(t *testing.T) {
-		fmt.Println(t.Name())
 		in := make(Bi)
 		done := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
