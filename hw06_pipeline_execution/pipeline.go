@@ -18,6 +18,8 @@ func wrStage(in In, done In, s Stage) Out {
 		for {
 			select {
 			case <-done:
+				// Без этого тест done блокирется на зпись в канал.
+				// С этим, проваливается по времени
 				for v := range readChan {
 					_ = v
 				}
