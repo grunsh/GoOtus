@@ -8,29 +8,24 @@ type (
 
 type Stage func(in In) (out Out)
 
-func wrStage(in In, done In, s Stage) Out {
+func inDone(in In, done In) Out {
 	out := make(Bi)
-	var val interface{}
-	var ok bool
 	go func() {
 		defer close(out)
-		readChan := s(in)
 		for {
 			select {
 			case <-done:
-				// Без этого тест done блокирется на зпись в канал.
-				// С этим, проваливается по времени. Я в тупике. Прощу помощи. 5-ю ночь без сна.
-				for range readChan {
+				for range in {
 				}
 				return
-			case val, ok = <-readChan:
+			case val, ok := <-in:
 				if !ok {
 					return
 				}
 				select {
 				case out <- val:
 				case <-done:
-					for range readChan {
+					for range in {
 					}
 					return
 				}
@@ -43,7 +38,7 @@ func wrStage(in In, done In, s Stage) Out {
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
 	inChan := in
 	for _, stage := range stages {
-		inChan = wrStage(inChan, done, stage)
+		inChan = stage(inDone(inChan, done))
 	}
 	return inChan
 }
