@@ -19,9 +19,8 @@ func wrStage(in In, done In, s Stage) Out {
 			select {
 			case <-done:
 				// Без этого тест done блокирется на зпись в канал.
-				// С этим, проваливается по времени
-				for v := range readChan {
-					_ = v
+				// С этим, проваливается по времени. Я в тупике. Прощу помощи. 5-ю ночь без сна.
+				for range readChan {
 				}
 				return
 			case val, ok = <-readChan:
@@ -31,8 +30,7 @@ func wrStage(in In, done In, s Stage) Out {
 				select {
 				case out <- val:
 				case <-done:
-					for v := range readChan {
-						_ = v
+					for range readChan {
 					}
 					return
 				}
