@@ -12,7 +12,7 @@ import (
 
 const (
 	sleepPerStage = time.Millisecond * 100
-	fault         = sleepPerStage / 2 // Каюсь за это исправление и прошу помощи. Я в тупике.
+	fault         = sleepPerStage / 2
 )
 
 var isFullTesting = true
@@ -41,7 +41,6 @@ func TestPipeline(t *testing.T) {
 	}
 
 	t.Run("simple case", func(t *testing.T) {
-		fmt.Println(t.Name())
 		in := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
 
@@ -60,14 +59,17 @@ func TestPipeline(t *testing.T) {
 		elapsed := time.Since(start)
 
 		require.Equal(t, []string{"102", "104", "106", "108", "110"}, result)
+		estimate := int64(sleepPerStage)*int64(len(stages)+len(data)-1) + int64(fault)
 		require.Less(t,
 			int64(elapsed),
 			// ~0.8s for processing 5 values in 4 stages (100ms every) concurrently
-			int64(sleepPerStage)*int64(len(stages)+len(data)-1)+int64(fault))
+			estimate,
+			fmt.Sprintf("Рассчётное время: %d, время выполнения: %d", estimate, int64(elapsed)),
+		)
+
 	})
 
 	t.Run("done case", func(t *testing.T) {
-		fmt.Println(t.Name())
 		in := make(Bi)
 		done := make(Bi)
 		data := []int{1, 2, 3, 4, 5}
@@ -99,7 +101,6 @@ func TestPipeline(t *testing.T) {
 }
 
 func TestAllStageStop(t *testing.T) {
-	fmt.Println(t.Name())
 	if !isFullTesting {
 		return
 	}
@@ -159,7 +160,6 @@ func TestAllStageStop(t *testing.T) {
 }
 
 func TestTenStages(t *testing.T) {
-	fmt.Println(t.Name())
 	if !isFullTesting {
 		return
 	}
@@ -195,7 +195,6 @@ func TestTenStages(t *testing.T) {
 	}
 
 	t.Run("Ten stages", func(t *testing.T) {
-		fmt.Println(t.Name())
 		in := make(Bi)
 		done := make(Bi)
 		data := []int{1, 2, 3, 4, 5}

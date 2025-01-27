@@ -22,13 +22,7 @@ func inDone(in In, done In) Out {
 				if !ok {
 					return
 				}
-				select {
-				case out <- val:
-				case <-done:
-					for range in {
-					}
-					return
-				}
+				out <- val
 			}
 		}
 	}()
