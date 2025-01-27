@@ -16,7 +16,13 @@ func inDone(in In, done In) Out {
 			for range in {
 			}
 		}()
+
 		for {
+			select {
+			case <-done:
+				return
+			default:
+			}
 			select {
 			case <-done:
 				return
