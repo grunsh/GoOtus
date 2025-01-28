@@ -11,18 +11,18 @@ type Stage func(in In) (out Out)
 func inDone(in In, done In) Out {
 	out := make(Bi)
 	go func() {
-		defer close(out)
 		defer func() {
+			close(out)
 			for range in {
 			}
 		}()
-
+		select {
+		case <-done:
+			return
+		default:
+		}
 		for {
-			select {
-			case <-done:
-				return
-			default:
-			}
+
 			select {
 			case <-done:
 				return
