@@ -80,7 +80,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	var CopyErr error
 	if offset+limit >= inFileInfo.Size() || (offset == 0 && limit == 0) {
 		fmt.Println("Для отладки (if): ", inFileInfo.Size(), offset, limit)
-		Bar = pb.Full.Start64(inFileInfo.Size())
+		Bar = pb.Full.Start64(inFileInfo.Size() - offset)
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.Copy(outFile, barReader)
 		if CopyErr != nil {
