@@ -3,9 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/cheggaaa/pb/v3"
 	"io"
 	"os"
+
+	"github.com/cheggaaa/pb/v3" //nolint
 )
 
 var (
@@ -21,18 +22,18 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// Получаем информацию о файле
 	fileInfo, err := os.Stat(fromPath)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrUnsupportedFile, err)
+		return fmt.Errorf("%w: %w", ErrUnsupportedFile, err)
 	}
 
 	// Проверяем, является ли файл устройством
 	if fileInfo.Mode()&os.ModeDevice != 0 {
-		return fmt.Errorf("%w: %v", ErrUnsupportedFile, err)
+		return fmt.Errorf("%w: %w", ErrUnsupportedFile, err)
 	}
 
 	// Открываем файл. Выходим, если ошибка.
 	inFile, err := os.Open(fromPath)
 	if err != nil {
-		return fmt.Errorf("%w: %v", ErrOpeningFile, err)
+		return fmt.Errorf("%w: %w", ErrOpeningFile, err)
 	}
 	defer func() {
 		er := inFile.Close()
@@ -44,7 +45,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// Получаем размер файла.
 	inFileInfo, err := inFile.Stat()
 	if err != nil {
-		return fmt.Errorf("%w (%s): %v", ErrGettingFileSize, fromPath, err)
+		return fmt.Errorf("%w (%s): %w", ErrGettingFileSize, fromPath, err)
 	}
 	fmt.Println("Размер входного файла: ", inFileInfo.Size())
 
@@ -56,7 +57,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// Создание целевого файла
 	outFile, err := os.Create(toPath)
 	if err != nil {
-		return fmt.Errorf("%w(%s): %v", ErrCreatiingFile, toPath, err)
+		return fmt.Errorf("%w(%s): %w", ErrCreatiingFile, toPath, err)
 	}
 	defer func() {
 		er := outFile.Close()
@@ -78,14 +79,14 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.Copy(outFile, barReader)
 		if CopyErr != nil {
-			return fmt.Errorf("%w (from %s to %s): %v", ErrCopingFile, inFile, toPath, CopyErr)
+			return fmt.Errorf("%w (from %s to %s): %w", ErrCopingFile, inFile.Name(), toPath, CopyErr)
 		}
 	} else {
 		Bar := pb.Full.Start64(limit)
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.CopyN(outFile, barReader, limit)
 		if CopyErr != nil {
-			return fmt.Errorf("%w (from %s to %s): %v", ErrCopingFile, inFile, toPath, CopyErr)
+			return fmt.Errorf("%w (from %s to %s): %w", ErrCopingFile, inFile.Name(), toPath, CopyErr)
 		}
 	}
 
