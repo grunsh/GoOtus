@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/require" //nolint
 )
 
 func ReadOneString(filename string) (string, error) {
@@ -88,5 +88,4 @@ func TestCopy(t *testing.T) {
 		require.NoError(t, erOutFileSize)
 		require.NoError(t, erDel)
 	})
-
 }
