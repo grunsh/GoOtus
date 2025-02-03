@@ -14,7 +14,7 @@ var (
 	ErrOffsetExceedsFileSize = errors.New("offset exceeds file size")
 	ErrGettingFileSize       = errors.New("cant get file size")
 	ErrOpeningFile           = errors.New("opening file failed")
-	ErrCreatiingFile         = errors.New("creating target file failed")
+	ErrCreatingFile          = errors.New("creating target file failed")
 	ErrCopingFile            = errors.New("copy file failed")
 	ErrFileSeek              = errors.New("file seek failed")
 )
@@ -58,7 +58,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	// Создание целевого файла
 	outFile, err := os.Create(toPath)
 	if err != nil {
-		return fmt.Errorf("%w(%s): %w", ErrCreatiingFile, toPath, err)
+		return fmt.Errorf("%w(%s): %w", ErrCreatingFile, toPath, err)
 	}
 	defer func() {
 		er := outFile.Close()
@@ -79,7 +79,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	var WrCount int64
 	var CopyErr error
 	if offset+limit >= inFileInfo.Size() || (offset == 0 && limit == 0) {
-		fmt.Println("Для отладки (if): ", inFileInfo.Size(), offset, limit)
 		Bar = pb.Full.Start64(inFileInfo.Size() - offset)
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.Copy(outFile, barReader)
@@ -87,7 +86,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 			return fmt.Errorf("%w (from %s to %s): %w", ErrCopingFile, inFile.Name(), toPath, CopyErr)
 		}
 	} else {
-		fmt.Println("Для отладки (else): ", inFileInfo.Size(), offset, limit)
 		Bar = pb.Full.Start64(limit)
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.CopyN(outFile, barReader, limit)
@@ -97,7 +95,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	}
 
 	fmt.Println("Скопировано: ", WrCount)
-	// finish bar
+
 	Bar.Finish()
 	return nil
 }
