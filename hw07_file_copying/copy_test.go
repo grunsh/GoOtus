@@ -75,16 +75,17 @@ func TestCopy(t *testing.T) {
 
 	// Проверяем нулевой целевой файл.
 	t.Run("Нулевой целевой файл из-за лимита и смещения", func(t *testing.T) {
-		fmt.Println(t.Name())
-		err := Copy("./testdata/input.txt", "out_test.txt", 6742, 0)
+		inFileSize, erInFileSize := GetfileSize("./testdata/input.txt")
+		err := Copy("./testdata/input.txt", "out_test.txt", inFileSize, 0)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fileSize, erFileSize := GetfileSize("out_test.txt")
+		OutFileSize, erOutFileSize := GetfileSize("out_test.txt")
 		erDel := DeleteFile("out_test.txt")
-		require.Zero(t, fileSize)
+		require.Zero(t, OutFileSize)
 		require.NoError(t, err)
-		require.NoError(t, erFileSize)
+		require.NoError(t, erInFileSize)
+		require.NoError(t, erOutFileSize)
 		require.NoError(t, erDel)
 	})
 
