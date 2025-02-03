@@ -16,6 +16,7 @@ var (
 	ErrOpeningFile           = errors.New("opening file failed")
 	ErrCreatiingFile         = errors.New("creating target file failed")
 	ErrCopingFile            = errors.New("copy file failed")
+	ErrFileSeek              = errors.New("file seek failed")
 )
 
 func Copy(fromPath, toPath string, offset, limit int64) error {
@@ -68,7 +69,10 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 
 	// Сместим указатель, если его задали
 	if offset > 0 {
-		inFile.Seek(offset, io.SeekStart)
+		_, err := inFile.Seek(offset, io.SeekStart)
+		if err != nil {
+			return fmt.Errorf("%w: %w", ErrFileSeek, err)
+		}
 	}
 
 	var Bar *pb.ProgressBar
