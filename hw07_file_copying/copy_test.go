@@ -60,7 +60,7 @@ func TestCopy(t *testing.T) {
 	// С помощью смещения и лимита читаем слово "Pack" из input.txt.
 	t.Run("Read word \"Pack\" from input.txt", func(t *testing.T) {
 		fmt.Println(t.Name())
-		err := Copy("./testdata/input.txt", "out_test.txt", 14, 4)
+		err := Copy("./testdata/input.txt", "out_test.txt", 13, 4)
 		if err != nil {
 			fmt.Println(err)
 		}
