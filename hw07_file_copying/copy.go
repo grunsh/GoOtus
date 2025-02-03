@@ -78,7 +78,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	var Bar *pb.ProgressBar
 	var WrCount int64
 	var CopyErr error
-	if offset+limit > inFileInfo.Size() || (offset == 0 && limit == 0) {
+	if offset+limit >= inFileInfo.Size() || (offset == 0 && limit == 0) {
 		Bar = pb.Full.Start64(inFileInfo.Size())
 		barReader := Bar.NewProxyReader(inFile)
 		WrCount, CopyErr = io.Copy(outFile, barReader)
