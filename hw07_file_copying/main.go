@@ -20,11 +20,6 @@ func init() {
 func main() {
 	flag.Parse()
 
-	from = ".\\testdata\\out_offset0_limit0.txt"
-	to = "c:\\temp\\123456789"
-
-	fmt.Println(from)
-	fmt.Println(to)
 	err := Copy(from, to, 0, 0)
 	if err != nil {
 		fmt.Println(err)
