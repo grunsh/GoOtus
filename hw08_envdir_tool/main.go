@@ -1,5 +1,16 @@
 package main
 
+import (
+	"fmt"
+	"os"
+)
+
 func main() {
-	// Place your code here.
+	env, er := ReadDir(".\\testdata\\env\\")
+	if er != nil {
+		fmt.Println(er)
+	}
+
+	d := RunCmd(os.Args, env)
+	_ = d
 }
