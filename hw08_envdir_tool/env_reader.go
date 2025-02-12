@@ -62,7 +62,7 @@ func ReadDir(dir string) (Environment, error) {
 			continue
 		}
 		fileName := file.Name()
-		env, err := readEnvFile(dir + fileName)
+		env, err := readEnvFile(dir + "/" + fileName)
 		if err != nil {
 			return nil, fmt.Errorf("не удалось прочитать файл %s переменных: %w", dir+"/"+fileName, err)
 		}
