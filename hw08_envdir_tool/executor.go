@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"os/exec"
 )
 
 // RunCmd runs a command + arguments (cmd) with environment variables from env.
 func RunCmd(cmd []string, env Environment) (returnCode int) {
-	var exitCode int = 0
+	var exitCode int
 	for k, v := range env {
 		if v.NeedRemove {
 			os.Unsetenv(k)
@@ -16,16 +16,17 @@ func RunCmd(cmd []string, env Environment) (returnCode int) {
 		}
 		os.Setenv(k, v.Value)
 	}
-	comd := exec.Command(fmt.Sprintf("%s %s %s", cmd[2], cmd[3], cmd[4]))
+	comd := exec.Command(cmd[2], cmd[3], cmd[4]) //nolint
 	comd.Stdout = os.Stdout
 	comd.Stderr = os.Stderr
 	err := comd.Start()
 	if err != nil {
+		panic("Error starting command: " + err.Error())
 	}
 	err = comd.Wait()
 	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			// Команда завершилась с ненулевым кодом завершения
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			exitCode = exitError.ExitCode()
 		}
 	}

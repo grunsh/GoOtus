@@ -6,11 +6,12 @@ import (
 )
 
 func main() {
-	env, er := ReadDir(".\\testdata\\env\\")
+	Args := os.Args
+	env, er := ReadDir(Args[1])
 	if er != nil {
 		fmt.Println(er)
 	}
 
-	d := RunCmd(os.Args, env)
+	d := RunCmd(Args, env)
 	_ = d
 }

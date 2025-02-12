@@ -16,7 +16,6 @@ type EnvValue struct {
 }
 
 func readEnvFile(filename string) (EnvValue, error) {
-
 	var retValue EnvValue
 
 	file, err := os.Open(filename)
@@ -24,7 +23,7 @@ func readEnvFile(filename string) (EnvValue, error) {
 		return EnvValue{
 			Value:      "",
 			NeedRemove: false,
-		}, fmt.Errorf("Ошибка открытия файла %s переменной", filename, err)
+		}, fmt.Errorf("ошибка открытия файла %s переменной: %w", filename, err)
 	}
 	defer file.Close()
 
@@ -38,7 +37,7 @@ func readEnvFile(filename string) (EnvValue, error) {
 		return EnvValue{
 			Value:      "",
 			NeedRemove: false,
-		}, fmt.Errorf("Ошибка чтения переменной из файла: %s", filename, err)
+		}, fmt.Errorf("ошибка чтения переменной из файла: %s: %w", filename, err)
 	}
 
 	if retValue.Value == "" {
@@ -51,13 +50,11 @@ func readEnvFile(filename string) (EnvValue, error) {
 // ReadDir reads a specified directory and returns map of env variables.
 // Variables represented as files where filename is name of variable, file first line is a value.
 func ReadDir(dir string) (Environment, error) {
-
 	RetVal := make(Environment)
 
 	files, err := os.ReadDir(dir)
-
 	if err != nil {
-		return nil, fmt.Errorf("Не удалось прочитать каталог %s файлов переменных: %w", dir, err)
+		return nil, fmt.Errorf("не удалось прочитать каталог %s файлов переменных: %w", dir, err)
 	}
 
 	for _, file := range files {
@@ -67,7 +64,7 @@ func ReadDir(dir string) (Environment, error) {
 		fileName := file.Name()
 		env, err := readEnvFile(dir + fileName)
 		if err != nil {
-			return nil, fmt.Errorf("Не удалось прочитать файл %s переменных: %w", dir+fileName, err)
+			return nil, fmt.Errorf("не удалось прочитать файл %s переменных: %w", dir+fileName, err)
 		}
 		RetVal[fileName] = env
 	}
