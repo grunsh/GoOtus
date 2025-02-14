@@ -19,15 +19,15 @@ func (m MockCommandRunner) Wait() error {
 }
 
 func (m MockCommandRunner) SetStdout(stdout *os.File) {
-	// Ничего не делаем, так как это мок.
+	_ = stdout.Name()
 }
 
 func (m MockCommandRunner) SetStderr(stderr *os.File) {
-	// Ничего не делаем, так как это мок.
+	_ = stderr.Name()
 }
 
 func (m MockCommandRunner) SetStdin(stdin *os.File) {
-	// Ничего не делаем, так как это мок.
+	_ = stdin.Name()
 }
 
 func TestRunCmd(t *testing.T) {

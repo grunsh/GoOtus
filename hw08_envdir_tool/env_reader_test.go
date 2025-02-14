@@ -29,7 +29,7 @@ func TestReadDir(t *testing.T) {
 
 	// Подкаталог, чтобы проверить, что игнорируется
 	subDirPath := tmpDir + "/subdir"
-	err = os.Mkdir(subDirPath, 0755)
+	err = os.Mkdir(subDirPath, 0o755)
 	require.NoError(t, err)
 
 	t.Run("Успешное чтение каталога", func(t *testing.T) {

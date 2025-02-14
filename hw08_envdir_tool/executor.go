@@ -68,7 +68,6 @@ func RunCmd(cmd []string, env Environment, commandRunner CommandRunner) (returnC
 	commandRunner.SetStdin(os.Stdin)
 
 	err := commandRunner.Run()
-
 	if err != nil {
 		panic("Error starting command: " + err.Error())
 	}
