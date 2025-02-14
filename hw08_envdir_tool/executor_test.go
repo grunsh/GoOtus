@@ -32,7 +32,7 @@ func (m MockCommandRunner) SetStdin(stdin *os.File) {
 
 func (m MockCommandRunner) SetCommand(cmd []string) {
 	// Ничего не делаем, так как это мок.
-	_ = cmd[0]
+	_ = cmd
 }
 
 func TestRunCmd(t *testing.T) {
