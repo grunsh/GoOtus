@@ -2,12 +2,25 @@ run:
   tests: true
   build-tags:
     - bench
-    - !bench
+#    - !bench
 
 linters-settings:
   funlen:
     lines: 150
     statements: 80
+  depguard:
+    rules:
+      prevent_unmaintained_packages:
+        list-mode: lax # allow unless explicitely denied
+        files:
+          - $all
+          - "!$test"
+        allow:
+          - $gostd
+          - "github.com/stretchr/testify/require"
+        deny:
+          - pkg: io/ioutil
+
 
 issues:
   exclude-rules:

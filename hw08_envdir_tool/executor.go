@@ -13,6 +13,7 @@ type CommandRunner interface {
 	SetStdout(stdout *os.File)
 	SetStderr(stderr *os.File)
 	SetStdin(stdin *os.File)
+	SetCommand(cmd []string) // Добавляем метод для установки команды.
 }
 
 // RealCommandRunner — реализация CommandRunner, которая использует exec.Command.
@@ -40,6 +41,11 @@ func (r RealCommandRunner) SetStdin(stdin *os.File) {
 	r.cmd.Stdin = stdin
 }
 
+func (r RealCommandRunner) SetCommand(cmd []string) {
+	// Устанавливаем команду и аргументы.
+	r.cmd = exec.Command(cmd[0], cmd[1:]...) //nolint
+}
+
 // NewCommand создает новую команду с использованием exec.Command.
 func NewCommand(name string, arg ...string) CommandRunner {
 	return RealCommandRunner{cmd: exec.Command(name, arg...)}
@@ -61,6 +67,7 @@ func RunCmd(cmd []string, env Environment, commandRunner CommandRunner) (returnC
 			exitCode = 1
 		}
 	}
+	commandRunner.SetCommand(cmd)
 
 	// Используем методы интерфейса для настройки потоков ввода-вывода.
 	commandRunner.SetStdout(os.Stdout)

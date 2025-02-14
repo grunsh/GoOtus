@@ -30,6 +30,11 @@ func (m MockCommandRunner) SetStdin(stdin *os.File) {
 	_ = stdin.Name()
 }
 
+func (m MockCommandRunner) SetCommand(cmd []string) {
+	// Ничего не делаем, так как это мок.
+	_ = cmd[0]
+}
+
 func TestRunCmd(t *testing.T) {
 	// Устанавливаем переменную окружения Test12.
 	env := Environment{
@@ -41,6 +46,7 @@ func TestRunCmd(t *testing.T) {
 
 	// Создаем моковый CommandRunner.
 	mockRunner := MockCommandRunner{}
+	mockRunner.SetCommand([]string{})
 
 	// Вызываем тестируемую функцию с моковым CommandRunner.
 	exitCode := RunCmd([]string{"dummy", "arg1", "echo", "hello"}, env, mockRunner)
