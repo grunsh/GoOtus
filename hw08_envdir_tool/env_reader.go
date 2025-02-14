@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -51,6 +52,7 @@ func readEnvFile(filename string) (EnvValue, error) {
 // Variables represented as files where filename is name of variable, file first line is a value.
 func ReadDir(dir string) (Environment, error) {
 	RetVal := make(Environment)
+	re := regexp.MustCompile(`^[^=]*$`)
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
@@ -59,6 +61,9 @@ func ReadDir(dir string) (Environment, error) {
 
 	for _, file := range files {
 		if file.IsDir() {
+			continue
+		}
+		if !re.MatchString(file.Name()) {
 			continue
 		}
 		fileName := file.Name()

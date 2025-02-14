@@ -11,7 +11,8 @@ func main() {
 	if er != nil {
 		fmt.Println(er)
 	}
-
-	d := RunCmd(Args, env)
-	_ = d
+	// Создаем реальный CommandRunner.
+	commandRunner := NewCommand(Args[2], Args[3:]...)
+	d := RunCmd(Args, env, commandRunner)
+	_ = d // чтоб не ругалось :)
 }
