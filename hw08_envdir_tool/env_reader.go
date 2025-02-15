@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strings"
 )
 
 type Environment map[string]EnvValue
@@ -26,13 +25,16 @@ func readEnvFile(filename string) (EnvValue, error) {
 			NeedRemove: false,
 		}, fmt.Errorf("ошибка открытия файла %s переменной: %w", filename, err)
 	}
-	defer file.Close()
+	defer func() { // Чтобы не должбал ворнинг при каждом коммите
+		err := file.Close()
+		if err != nil {
+			panic("Это конечно ужасно и странно, но не удалось заклрыть файл: " + err.Error())
+		}
+	}()
 
 	scanner := bufio.NewScanner(file)
 	if scanner.Scan() {
 		retValue.Value = scanner.Text() // Получаем текст строки
-		retValue.Value = strings.TrimRight(retValue.Value, " \t")
-		retValue.Value = strings.ReplaceAll(retValue.Value, "\x00", "\n")
 	}
 	if err := scanner.Err(); err != nil {
 		return EnvValue{
@@ -40,7 +42,6 @@ func readEnvFile(filename string) (EnvValue, error) {
 			NeedRemove: false,
 		}, fmt.Errorf("ошибка чтения переменной из файла: %s: %w", filename, err)
 	}
-
 	if retValue.Value == "" {
 		retValue.NeedRemove = true
 	}

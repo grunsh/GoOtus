@@ -4,9 +4,11 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 // CommandRunner — интерфейс для запуска команд.
+// Весь этот балаган с интерфейсами ради того, чтобы можно было замокать cmd в тестах.
 type CommandRunner interface {
 	Run() error
 	Wait() error
@@ -52,19 +54,21 @@ func NewCommand(name string, arg ...string) CommandRunner {
 }
 
 // RunCmd runs a command + arguments (cmd) with environment variables from env.
-func RunCmd(cmd []string, env Environment, commandRunner CommandRunner) (returnCode int) {
-	var exitCode int
+func RunCmd(cmd []string, env Environment, commandRunner CommandRunner) (returnCode int) { //nolint
+	returnCode = 0
 	for k, v := range env {
 		if v.NeedRemove {
 			er := os.Unsetenv(k)
 			if er != nil {
-				exitCode = 1
+				returnCode = 1
 			}
 			continue
 		}
+		v.Value = strings.TrimRight(v.Value, " \t")
+		v.Value = strings.ReplaceAll(v.Value, "\x00", "\n")
 		er := os.Setenv(k, v.Value)
 		if er != nil {
-			exitCode = 1
+			returnCode = 1
 		}
 	}
 	commandRunner.SetCommand(cmd)
@@ -82,8 +86,8 @@ func RunCmd(cmd []string, env Environment, commandRunner CommandRunner) (returnC
 	if err != nil {
 		var exitError *exec.ExitError
 		if errors.As(err, &exitError) {
-			exitCode = exitError.ExitCode()
+			returnCode = exitError.ExitCode()
 		}
 	}
-	return exitCode
+	return
 }

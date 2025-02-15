@@ -3,14 +3,16 @@ package main
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // MockCommandRunner — моковая реализация CommandRunner.
-type MockCommandRunner struct{}
+type MockCommandRunner struct {
+	Environments map[string]string
+}
 
 func (m MockCommandRunner) Run() error {
-	// Выводим значение переменной окружения Test12.
-	println("Test12:", os.Getenv("Test12"))
 	return nil
 }
 
@@ -37,22 +39,65 @@ func (m MockCommandRunner) SetCommand(cmd []string) {
 
 func TestRunCmd(t *testing.T) {
 	// Устанавливаем переменную окружения Test12.
-	env := Environment{
-		"Test12": EnvValue{
-			Value:      "MockedValue",
-			NeedRemove: false,
+	Tests := []struct {
+		name          string
+		envName       string
+		envValue      string
+		expectedName  string
+		expectedValue string
+		remove        bool
+	}{
+		{
+			name:          "Однобуквенная переменная с однобуквенным значением",
+			envName:       "A",
+			envValue:      "A",
+			expectedName:  "A",
+			expectedValue: "A",
+			remove:        false,
+		},
+		{
+			name:          "После однобуквенной переменной, удалим её",
+			envName:       "A",
+			envValue:      "A",
+			expectedName:  "",
+			expectedValue: "",
+			remove:        true,
+		},
+		{
+			name:          "Переменная с подчёркиванием",
+			envName:       "TEST_A",
+			envValue:      "WITH_UNDERLINE",
+			expectedName:  "TEST_A",
+			expectedValue: "WITH_UNDERLINE",
+			remove:        false,
+		},
+		{
+			name:          "Переменная с тремя терминальными нулями подряд",
+			envName:       "TRIPPLE_ZERO_BYTES",
+			envValue:      "STRING WITH\x00ONE\x00TWO\x00THREE ZERO BYTES",
+			expectedName:  "TRIPPLE_ZERO_BYTES",
+			expectedValue: "STRING WITH\nONE\nTWO\nTHREE ZERO BYTES",
+			remove:        false,
 		},
 	}
 
-	// Создаем моковый CommandRunner.
 	mockRunner := MockCommandRunner{}
 	mockRunner.SetCommand([]string{})
 
 	// Вызываем тестируемую функцию с моковым CommandRunner.
-	exitCode := RunCmd([]string{"dummy", "arg1", "echo", "hello"}, env, mockRunner)
-
-	// Проверяем, что функция завершилась с кодом 0.
-	if exitCode != 0 {
-		t.Errorf("Expected exit code 0, got %d", exitCode)
+	for _, test := range Tests {
+		t.Run(test.name, func(t *testing.T) {
+			env := Environment{
+				test.envName: EnvValue{
+					Value:      test.envValue,
+					NeedRemove: test.remove,
+				},
+			}
+			_ = RunCmd([]string{""}, env, mockRunner)
+			require.Equal(t, test.expectedValue, os.Getenv(test.envName))
+			if test.remove {
+				require.Equal(t, test.expectedName, os.Getenv(test.envName))
+			}
+		})
 	}
 }
