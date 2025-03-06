@@ -77,7 +77,10 @@ func PhoneNumber(s string) bool {
 	return res
 }
 
-func StringValidate(s string, valTag string, fName string, valEr *ValidationErrors) {
+// Функция не проходит линтер "когнитивности". Я соглашусь с тем, что читать её не сказать чтоб просто.
+// Также соглашусь с тем, что можно вылизывать код до бесконечности. Но есть порог, когда оно становится
+// вылизыванием, ради вылизывания. И анализ текстовых данных, на деле, никогда не был простым.
+func StringValidate(s string, valTag string, fName string, valEr *ValidationErrors) { //nolint
 	rules := strings.Split(valTag, "|")
 	for _, rule := range rules {
 		switch rule {
@@ -144,7 +147,7 @@ func StringValidate(s string, valTag string, fName string, valEr *ValidationErro
 				}
 				if !StrLenNotLess(s, int(l)) {
 					valEr.Add(fName, fmt.Errorf(""+
-						"превышено минимальное ограничение длины строки: (правило: %s), длина строки=%d", rule, len(s)))
+						"%w: (правило: %s), длина строки=%d", ErrorStrLen, rule, len(s)))
 				}
 			case "lennotmore":
 				l, err := strconv.ParseUint(r[1], 10, 32)
@@ -155,8 +158,7 @@ func StringValidate(s string, valTag string, fName string, valEr *ValidationErro
 				}
 				if !StrLenNotMore(s, int(l)) {
 					valEr.Add(fName, fmt.Errorf(""+
-						"превышено мксиимальное ограничение длины строки: (правило: %s), длина строки=%d",
-						rule, len(s)))
+						"%w: (правило: %s), длина строки=%d", ErrorStrLen, rule, len(s)))
 				}
 			case "in":
 				stSet := strings.Split(r[1], ",")

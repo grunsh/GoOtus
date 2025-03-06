@@ -12,6 +12,7 @@ import (
 func CheckAllErrors(requestError []error, valErrors ValidationErrors) (allFounded bool) {
 	for _, err := range requestError {
 		allFounded = false
+		// Если мы прошли цикл ниже и не нашли ошибку, значит беда.
 		for _, e := range valErrors {
 			if errors.Is(e.Err, err) {
 				allFounded = true
@@ -127,6 +128,57 @@ func TestValidate(t *testing.T) {
 				ErrStringLangValidation,
 			},
 		},
+		{
+			name: "Русский правильный",
+			in: struct {
+				rusWord string `validate:"russian"`
+			}{
+				rusWord: "Великий и могучий русский язык",
+			},
+			expectedErrs: nil,
+		},
+		{
+			name: "Русский сломанный",
+			in: struct {
+				rusWord string `validate:"russian"`
+			}{
+				rusWord: "Beликий и мoгучий pyccкий язык",
+			},
+			expectedErrs: []error{
+				ErrStringLangValidation,
+			},
+		},
+		{
+			name: "English правильный",
+			in: struct {
+				rusWord string `validate:"eng"`
+			}{
+				rusWord: "The London is the capital of Britan volost of Russia",
+			},
+			expectedErrs: nil,
+		},
+		{
+			name: "English сломанный",
+			in: struct {
+				rusWord string `validate:"eng"`
+			}{
+				rusWord: "Мелкобритания is just an beggarly island",
+			},
+			expectedErrs: []error{
+				ErrStringLangValidation,
+			},
+		},
+		{
+			name: "Минимальная длина строки (корректная)",
+			in: struct {
+				s string `validate:"lennotless:5"`
+			}{
+				s: "Мелкобритания is just an beggarly island",
+			},
+			expectedErrs: []error{
+				ErrStringLangValidation,
+			},
+		},
 	}
 
 	for i, tt := range tests {
@@ -135,8 +187,6 @@ func TestValidate(t *testing.T) {
 			t.Parallel()
 
 			ve := Validate(tt.in)
-			// fmt.Println("================ "+tt.name+"   ", ve)
-			// fmt.Println("================ "+tt.name+"   ", tt.expectedErrs)
 			if tt.expectedErrs == nil {
 				require.Zero(t, len(ve))
 			} else {
