@@ -237,7 +237,6 @@ var tests = []struct {
 }
 
 func TestValidate(t *testing.T) {
-
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d: %s", i, tt.name), func(t *testing.T) {
 			//			tt := tt
