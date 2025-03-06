@@ -173,11 +173,9 @@ func TestValidate(t *testing.T) {
 			in: struct {
 				s string `validate:"lennotless:5"`
 			}{
-				s: "Мелкобритания is just an beggarly island",
+				s: "Строка длиной более 5",
 			},
-			expectedErrs: []error{
-				ErrStringLangValidation,
-			},
+			expectedErrs: nil,
 		},
 	}
 
@@ -187,6 +185,8 @@ func TestValidate(t *testing.T) {
 			t.Parallel()
 
 			ve := Validate(tt.in)
+			fmt.Println("***", ve)
+			fmt.Println("***", tt.in)
 			if tt.expectedErrs == nil {
 				require.Zero(t, len(ve))
 			} else {

@@ -40,7 +40,7 @@ linters:
     - errorlint
     - funlen
     - gci
-#    - gocognit
+    - gocognit
     - goconst
     - gocritic
     - gocyclo
