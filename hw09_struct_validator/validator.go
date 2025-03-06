@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 
 	"golang.org/x/exp/constraints"
@@ -24,9 +23,8 @@ var (
 	ErrorStringDict          = errors.New("нет в словаре")
 	ErrorIntMin              = errors.New("ниже минимального")
 	ErrorIntMax              = errors.New("больше  максимального")
+	ErrorIntNotInSet         = errors.New("целое не входит в множество")
 )
-
-var MinMaxIntRe = regexp.MustCompile(`^min:-?\d+\|max:-?\d+$`)
 
 type ValidationError struct {
 	Field string

@@ -12,7 +12,9 @@ import (
 func CheckAllErrors(requestError []error, valErrors ValidationErrors) (allFounded bool) {
 	for _, err := range requestError {
 		allFounded = false
-		// Если мы прошли цикл ниже и не нашли ошибку, значит беда.
+		// Если мы прошли цикл ниже и не нашли ошибку, значит беда. Это означает, что искомая ошибка
+		// не присутствует в массиве ошибок, а они должны быть найдены все до одной. Т.е. все ошибки
+		// из requestError, должны быть найдены в valErrors. Если хотя бы одна не найдена, то косяк.
 		for _, e := range valErrors {
 			if errors.Is(e.Err, err) {
 				allFounded = true
@@ -59,6 +61,52 @@ func TestValidate(t *testing.T) {
 		in           interface{}
 		expectedErrs []error
 	}{
+		{
+			name: "По типу Response правильное",
+			in: Response{
+				Code: 200,
+				Body: "Тельце тщедушное",
+			},
+			expectedErrs: nil,
+		},
+		{
+			name: "По типу Response провальное",
+			in: Response{
+				Code: 502,
+				Body: "Тельце тщедушное",
+			},
+			expectedErrs: []error{ErrorIntNotInSet},
+		},
+		{
+			name: "Бесполезная штука",
+			in: Token{
+				Header:    []byte(`{"alg":"HS256","typ":"JWT"}`),
+				Payload:   nil,
+				Signature: []byte(`{"alg":"HS256","typ":"JWT"}`),
+			},
+			expectedErrs: nil,
+		},
+		{
+			name: "Проверка по App правильная",
+			in: App{
+				Version: "12345",
+			},
+			expectedErrs: nil,
+		},
+		{
+			name: "Проверка по App не правильная, меньше",
+			in: App{
+				Version: "1234",
+			},
+			expectedErrs: []error{ErrorStrLen},
+		},
+		{
+			name: "Проверка по App не правильная, больше",
+			in: App{
+				Version: "123456",
+			},
+			expectedErrs: []error{ErrorStrLen},
+		},
 		{
 			name: "Корректный номер телефона",
 			in: struct {
@@ -177,6 +225,15 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErrs: nil,
 		},
+		{
+			name: "Минимальная длина строки (сломанная)",
+			in: struct {
+				s string `validate:"lennotless:55"`
+			}{
+				s: "Строка длиной более 5",
+			},
+			expectedErrs: []error{ErrorStrLen},
+		},
 	}
 
 	for i, tt := range tests {
@@ -185,8 +242,6 @@ func TestValidate(t *testing.T) {
 			t.Parallel()
 
 			ve := Validate(tt.in)
-			fmt.Println("***", ve)
-			fmt.Println("***", tt.in)
 			if tt.expectedErrs == nil {
 				require.Zero(t, len(ve))
 			} else {

@@ -109,7 +109,7 @@ func IntValidation[T AllInt](i T, validationTag string, strType string) (b bool,
 			}
 		case "in":
 			if !InSet(i, Params, signed) {
-				e = putErr(e, fmt.Errorf("(правило: %s) Значние поля %d не входит в множество", rule, i))
+				e = putErr(e, fmt.Errorf("%w: (правило: %s) значние поля %d", ErrorIntNotInSet, rule, i))
 				b = false
 			}
 		case "out":
