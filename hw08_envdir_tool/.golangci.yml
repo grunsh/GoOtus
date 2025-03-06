@@ -2,7 +2,7 @@ run:
   tests: true
   build-tags:
     - bench
-    - !bench
+#    - !bench
 
 linters-settings:
   funlen:
@@ -16,7 +16,10 @@ linters-settings:
           - $all
           - "!$test"
         allow:
-          github.com/stretchr/testify/require
+          - $gostd
+          - "github.com/stretchr/testify/require"
+        deny:
+          - pkg: io/ioutil
 
 
 issues:
@@ -38,6 +41,8 @@ linters:
     - bodyclose
     - durationcheck
     - errorlint
+    - exhaustive
+    - exportloopref
     - funlen
     - gci
     - gocognit
@@ -68,7 +73,7 @@ linters:
     - stylecheck
     - tagliatelle
     - thelper
-#    - typecheck
+    - typecheck
     - unconvert
     - unparam
     - unused
