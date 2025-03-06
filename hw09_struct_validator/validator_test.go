@@ -10,6 +10,7 @@ import (
 )
 
 func CheckAllErrors(requestError []error, valErrors ValidationErrors) (allFounded bool) {
+	allFounded = false
 	for _, err := range requestError {
 		allFounded = false
 		// Если мы прошли цикл ниже и не нашли ошибку, значит беда. Это означает, что искомая ошибка
