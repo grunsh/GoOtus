@@ -56,186 +56,187 @@ type (
 	}
 )
 
+var tests = []struct {
+	name         string
+	in           interface{}
+	expectedErrs []error
+}{
+	{
+		name: "По типу Response правильное",
+		in: Response{
+			Code: 200,
+			Body: "Тельце тщедушное",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "По типу Response провальное",
+		in: Response{
+			Code: 502,
+			Body: "Тельце тщедушное",
+		},
+		expectedErrs: []error{ErrorIntNotInSet},
+	},
+	{
+		name: "Бесполезная штука",
+		in: Token{
+			Header:    []byte(`{"alg":"HS256","typ":"JWT"}`),
+			Payload:   nil,
+			Signature: []byte(`{"alg":"HS256","typ":"JWT"}`),
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Проверка по App правильная",
+		in: App{
+			Version: "12345",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Проверка по App не правильная, меньше",
+		in: App{
+			Version: "1234",
+		},
+		expectedErrs: []error{ErrorStrLen},
+	},
+	{
+		name: "Проверка по App не правильная, больше",
+		in: App{
+			Version: "123456",
+		},
+		expectedErrs: []error{ErrorStrLen},
+	},
+	{
+		name: "Корректный номер телефона",
+		in: struct {
+			phonenumber string `validate:"phonenumber"`
+		}{
+			phonenumber: "+79991234567",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Не корректный номер телефона",
+		in: struct {
+			phonenumber string `validate:"phonenumber"`
+		}{
+			phonenumber: "-79991234567",
+		},
+		expectedErrs: []error{ErrPhoneNumberValidation},
+	},
+	{
+		name: "Корректный юзер",
+		in: User{
+			ID:     "012345678901234567890123456789123456",
+			Name:   "вася",
+			Age:    19,
+			Email:  "non@mail.com",
+			Role:   "admin",
+			Phones: []string{"79067240163", "79991234567"},
+			meta:   []byte{},
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Сломанный полностью юзер",
+		in: User{
+			ID:     "01234567890123456789012345678912345",
+			Name:   "вася",
+			Age:    10,
+			Email:  "()non@mail.com",
+			Role:   "admin_",
+			Phones: []string{"9067240163", "9991234567"},
+			meta:   []byte{},
+		},
+		expectedErrs: []error{
+			ErrorStrLen,
+			ErrorIntMin,
+			ErrRegexTagValidation,
+			ErrorStrLen,
+		},
+	},
+	{
+		name: "Китайский правильный",
+		in: struct {
+			chinaWord string `validate:"chinese"`
+		}{
+			chinaWord: "嘿混蛋",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Китайский сломанный",
+		in: struct {
+			chinaWord string `validate:"chinese"`
+		}{
+			chinaWord: "嘿混蛋апчхи",
+		},
+		expectedErrs: []error{
+			ErrStringLangValidation,
+		},
+	},
+	{
+		name: "Русский правильный",
+		in: struct {
+			rusWord string `validate:"russian"`
+		}{
+			rusWord: "Великий и могучий русский язык",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Русский сломанный",
+		in: struct {
+			rusWord string `validate:"russian"`
+		}{
+			rusWord: "Beликий и мoгучий pyccкий язык",
+		},
+		expectedErrs: []error{
+			ErrStringLangValidation,
+		},
+	},
+	{
+		name: "English правильный",
+		in: struct {
+			rusWord string `validate:"eng"`
+		}{
+			rusWord: "The London is the capital of Britan volost of Russia",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "English сломанный",
+		in: struct {
+			rusWord string `validate:"eng"`
+		}{
+			rusWord: "Мелкобритания is just an beggarly island",
+		},
+		expectedErrs: []error{
+			ErrStringLangValidation,
+		},
+	},
+	{
+		name: "Минимальная длина строки (корректная)",
+		in: struct {
+			s string `validate:"lennotless:5"`
+		}{
+			s: "Строка длиной более 5",
+		},
+		expectedErrs: nil,
+	},
+	{
+		name: "Минимальная длина строки (сломанная)",
+		in: struct {
+			s string `validate:"lennotless:55"`
+		}{
+			s: "Строка длиной более 5",
+		},
+		expectedErrs: []error{ErrorStrLen},
+	},
+}
+
 func TestValidate(t *testing.T) {
-	tests := []struct {
-		name         string
-		in           interface{}
-		expectedErrs []error
-	}{
-		{
-			name: "По типу Response правильное",
-			in: Response{
-				Code: 200,
-				Body: "Тельце тщедушное",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "По типу Response провальное",
-			in: Response{
-				Code: 502,
-				Body: "Тельце тщедушное",
-			},
-			expectedErrs: []error{ErrorIntNotInSet},
-		},
-		{
-			name: "Бесполезная штука",
-			in: Token{
-				Header:    []byte(`{"alg":"HS256","typ":"JWT"}`),
-				Payload:   nil,
-				Signature: []byte(`{"alg":"HS256","typ":"JWT"}`),
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Проверка по App правильная",
-			in: App{
-				Version: "12345",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Проверка по App не правильная, меньше",
-			in: App{
-				Version: "1234",
-			},
-			expectedErrs: []error{ErrorStrLen},
-		},
-		{
-			name: "Проверка по App не правильная, больше",
-			in: App{
-				Version: "123456",
-			},
-			expectedErrs: []error{ErrorStrLen},
-		},
-		{
-			name: "Корректный номер телефона",
-			in: struct {
-				phonenumber string `validate:"phonenumber"`
-			}{
-				phonenumber: "+79991234567",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Не корректный номер телефона",
-			in: struct {
-				phonenumber string `validate:"phonenumber"`
-			}{
-				phonenumber: "-79991234567",
-			},
-			expectedErrs: []error{ErrPhoneNumberValidation},
-		},
-		{
-			name: "Корректный юзер",
-			in: User{
-				ID:     "012345678901234567890123456789123456",
-				Name:   "вася",
-				Age:    19,
-				Email:  "non@mail.com",
-				Role:   "admin",
-				Phones: []string{"79067240163", "79991234567"},
-				meta:   []byte{},
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Сломанный полностью юзер",
-			in: User{
-				ID:     "01234567890123456789012345678912345",
-				Name:   "вася",
-				Age:    10,
-				Email:  "()non@mail.com",
-				Role:   "admin_",
-				Phones: []string{"9067240163", "9991234567"},
-				meta:   []byte{},
-			},
-			expectedErrs: []error{
-				ErrorStrLen,
-				ErrorIntMin,
-				ErrRegexTagValidation,
-				ErrorStrLen,
-			},
-		},
-		{
-			name: "Китайский правильный",
-			in: struct {
-				chinaWord string `validate:"chinese"`
-			}{
-				chinaWord: "嘿混蛋",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Китайский сломанный",
-			in: struct {
-				chinaWord string `validate:"chinese"`
-			}{
-				chinaWord: "嘿混蛋апчхи",
-			},
-			expectedErrs: []error{
-				ErrStringLangValidation,
-			},
-		},
-		{
-			name: "Русский правильный",
-			in: struct {
-				rusWord string `validate:"russian"`
-			}{
-				rusWord: "Великий и могучий русский язык",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Русский сломанный",
-			in: struct {
-				rusWord string `validate:"russian"`
-			}{
-				rusWord: "Beликий и мoгучий pyccкий язык",
-			},
-			expectedErrs: []error{
-				ErrStringLangValidation,
-			},
-		},
-		{
-			name: "English правильный",
-			in: struct {
-				rusWord string `validate:"eng"`
-			}{
-				rusWord: "The London is the capital of Britan volost of Russia",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "English сломанный",
-			in: struct {
-				rusWord string `validate:"eng"`
-			}{
-				rusWord: "Мелкобритания is just an beggarly island",
-			},
-			expectedErrs: []error{
-				ErrStringLangValidation,
-			},
-		},
-		{
-			name: "Минимальная длина строки (корректная)",
-			in: struct {
-				s string `validate:"lennotless:5"`
-			}{
-				s: "Строка длиной более 5",
-			},
-			expectedErrs: nil,
-		},
-		{
-			name: "Минимальная длина строки (сломанная)",
-			in: struct {
-				s string `validate:"lennotless:55"`
-			}{
-				s: "Строка длиной более 5",
-			},
-			expectedErrs: []error{ErrorStrLen},
-		},
-	}
 
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d: %s", i, tt.name), func(t *testing.T) {
