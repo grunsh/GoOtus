@@ -22,7 +22,7 @@ linters:
   disable-all: true
   enable:
     - asciicheck
-    - depguard
+#    - depguard Не вижу смысла в линтере, который матерится на ВСЕ модули, кроме стандартных
     - dogsled
     - dupl
     - bodyclose
