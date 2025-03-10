@@ -9,6 +9,9 @@ linters-settings:
     lines: 150
     statements: 80
 
+output:
+  format: colored-line-number
+
 issues:
   exclude-rules:
     - path: _test\.go
@@ -29,7 +32,7 @@ linters:
     - durationcheck
     - errorlint
     - exhaustive
-    - exportloopref
+#    - exportloopref The linter 'exportloopref' is deprecated (since v1.60.2)
     - funlen
     - gci
     - gocognit
