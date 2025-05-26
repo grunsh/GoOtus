@@ -33,7 +33,7 @@ jobs:
           args: --timeout=5m
 
       - name: Run tests
-        run: go test -v ./...
+        run: go test -race -count 100 ./...
 
       - name: Build
         run: go build -v ./imageproxy/server
