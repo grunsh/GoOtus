@@ -59,6 +59,7 @@ func main() {
 	cache := cache.NewLRUCache(CacheCapacity, storage)
 	processor := processor.NewImageProcessor(cache)
 
+	// Хендлер для тестирования.
 	http.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
