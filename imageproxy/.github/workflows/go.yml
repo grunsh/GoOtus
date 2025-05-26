@@ -31,10 +31,9 @@ jobs:
         with:
           version: v1.55.2 # Проверьте актуальную версию
           args: --timeout=5m
-          # Конфигурация будет автоматически взята из .golangci-lint.yml
 
       - name: Run tests
         run: go test -v ./...
 
       - name: Build
-        run: go build -v ./...
+        run: go build -v ./imageproxy/server
